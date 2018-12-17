@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import TodoHeader from './TodoHeader';
 import TodoItem from './TodoItem'
 import TodoFooter from "./TodoFooter";
+import * as filterTypes from './filter-types'
 
 
 export default class TodoApp extends Component{
@@ -10,9 +11,10 @@ export default class TodoApp extends Component{
         super(props);
         this.state = {todos:[
                 {id:Math.random(),title:'我要学习React',completed:false},
-                {id:Math.random(),title:'我要学习BootStrap',completed:true},
-
-            ]}; //初始化
+                {id:Math.random(),title:'我要学习BootStrap',completed:true}
+                ],
+                filterType:filterTypes.ALL
+        }; //初始化
     }
 
     // 添加一个待办
@@ -69,6 +71,11 @@ export default class TodoApp extends Component{
 
     }
 
+    // 改变过滤条件
+    changeFilterType = (filterType) => {
+        this.setState({filterType})
+
+    }
 
 
     render() {
@@ -79,6 +86,19 @@ export default class TodoApp extends Component{
             return count + (todo.completed?0:1);
 
         },0);
+
+        //过滤显示数据
+        let showTodos = todos.filter((todo)=>{
+            switch (this.state.filterType) {
+                case filterTypes.ACTIVE:
+                    return !todo.completed; //表示显示未完成的
+                case filterTypes.COMPLETED:
+                    return todo.completed;  //显示已完成的
+                default:
+                    return true;            //表示全部显示
+
+            }
+        })
 
 
 
@@ -100,7 +120,7 @@ export default class TodoApp extends Component{
                 }
 
                 {
-                    this.state.todos.map(
+                    showTodos.map(
                         (todo,idx) =>
                         <TodoItem key={idx} todo={todo} toggle={this.handleToggle} remove={this.handleRemove} ></TodoItem>
                     )
@@ -125,7 +145,7 @@ export default class TodoApp extends Component{
                                 {main}
                             </div>
                             <div className="panel-footer">
-                                <TodoFooter activeTodoCount={activeTodoCount}/>
+                                <TodoFooter activeTodoCount={activeTodoCount} changeFilterType ={this.changeFilterType} filterType={this.state.filterType} />
                             </div>
                         </div>
 
